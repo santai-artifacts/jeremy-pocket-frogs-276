@@ -12,9 +12,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Initialize database (Node's built-in SQLite — no native module needed)
-const dbPath = process.env.DATABASE_URL || path.join(__dirname, '../frogs.db');
+const dbPath = process.env.DATABASE_URL || path.join('/tmp', 'frogs.db');
 const db = new DatabaseSync(dbPath);
-console.log('Connected to SQLite database');
+console.log('Connected to SQLite database at', dbPath);
 
 // Small helpers mirroring the old async API so the routes below stay tidy.
 const run = (sql, params = []) => {
