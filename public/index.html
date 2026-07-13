@@ -626,7 +626,9 @@
   </div>
 
   <script>
-    const API_BASE = '/api';
+    // Dynamically construct API base URL to handle different deployment environments
+    const API_BASE = new URL('/api', window.location.origin).toString().replace(/\/$/, '');
+    console.log('API_BASE:', API_BASE);
     let allFrogs = [];
     let selectedFrogId = null;
     let currentHabitatId = null;
@@ -1107,23 +1109,34 @@
       }
 
       try {
-        const res = await fetch(`${API_BASE}/frogs`, {
+        const url = `${API_BASE}/frogs`;
+        console.log('Attempting to create frog at:', url);
+        const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, species })
         });
 
+        console.log('Response status:', res.status, 'Content-Type:', res.headers.get('content-type'));
+
         if (res.ok) {
+          const data = await res.json();
+          console.log('Frog created:', data);
           closeNewFrogModal();
           loadFrogs();
         } else {
-          const err = await res.json();
-          alert(`Error: ${err.error || 'Failed to create frog'}`);
-          console.error('Create frog error:', err);
+          const text = await res.text();
+          console.log('Response text:', text);
+          try {
+            const err = JSON.parse(text);
+            alert(`Error: ${err.error || 'Failed to create frog'}`);
+          } catch {
+            alert(`Error: Server returned ${res.status}`);
+          }
         }
       } catch (err) {
+        console.error('Full error:', err);
         alert(`Network error: ${err.message}`);
-        console.error('Create frog error:', err);
       }
     }
 
