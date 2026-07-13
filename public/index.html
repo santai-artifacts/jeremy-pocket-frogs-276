@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pocket Frogs</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header-subtitle {
+      font-size: 1.1em;
+      opacity: 0.95;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: scale(1.02);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-danger {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #ee5a52;
+    }
+
+    .btn-success {
+      background: #51cf66;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #40c057;
+    }
+
+    .frog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .frog-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 12px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+
+    .frog-card:hover {
+      transform: scale(1.05);
+      border-color: #667eea;
+    }
+
+    .frog-card.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .frog-emoji {
+      font-size: 3em;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .frog-name {
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .frog-level {
+      text-align: center;
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .habitat-container {
+      background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 100%);
+      border-radius: 12px;
+      padding: 20px;
+      height: 400px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .habitat-container.forest {
+      background: linear-gradient(180deg, #5a8c61 0%, #8fb89f 50%, #a8d5ba 100%);
+    }
+
+    .habitat-container.volcanic {
+      background: linear-gradient(180deg, #3d2817 0%, #6b4423 50%, #8b5a2b 100%);
+    }
+
+    .habitat-container.underwater {
+      background: linear-gradient(180deg, #1a472a 0%, #2e5f4f 50%, #4a9d7f 100%);
+    }
+
+    .habitat-container.arctic {
+      background: linear-gradient(180deg, #e8f4f8 0%, #b4e7f5 50%, #87ceeb 100%);
+    }
+
+    .frog-in-habitat {
+      position: absolute;
+      font-size: 4em;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .frog-in-habitat:active {
+      cursor: grabbing;
+    }
+
+    .habitat-item {
+      position: absolute;
+      font-size: 3em;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .habitat-item:active {
+      cursor: grabbing;
+    }
+
+    .habitat-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .stats {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .stat-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .stat-label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .stat-bar {
+      flex: 1;
+      margin: 0 10px;
+      height: 8px;
+      background: #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.3s;
+    }
+
+    .stat-value {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .breeding-card {
+      background: #fff3e0;
+      border-left: 4px solid #ffa726;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .breeding-card.hatched {
+      background: #e8f5e9;
+      border-left-color: #66bb6a;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-footer button {
+      flex: 1;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tab {
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: #999;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .color-picker {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .color-option {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .color-option:hover {
+      transform: scale(1.1);
+    }
+
+    .color-option.selected {
+      border-color: #333;
+      transform: scale(1.15);
+    }
+
+    .species-colors {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .species-color {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🐸 Pocket Frogs</h1>
+      <p class="header-subtitle">Raise, breed, and care for your collection of unique frogs!</p>
+    </header>
+
+    <div class="main-grid">
+      <!-- Left Panel: Frog Collection -->
+      <div class="card">
+        <h2>Your Frogs</h2>
+        <div class="button-group">
+          <button class="btn-primary" onclick="openNewFrogModal()">Add New Frog</button>
+        </div>
+        <div class="frog-grid" id="frogGrid">
+          <div class="empty-state">
+            <div class="empty-state-icon">🐸</div>
+            <p>No frogs yet. Create your first frog to get started!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Frog Details & Habitat -->
+      <div id="detailsPanel">
+        <div class="card">
+          <h2>Select a frog to view details</h2>
+          <div class="empty-state">
+            <div class="empty-state-icon">👋</div>
+            <p>Click on a frog to see its stats and habitat</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breeding Section -->
+    <div class="card">
+      <h2>Breeding Center</h2>
+      <div class="button-group">
+        <button class="btn-success" onclick="openBreedingModal()">Start Breeding</button>
+      </div>
+      <div id="breedingList">
+        <div class="empty-state">
+          <div class="empty-state-icon">💕</div>
+          <p>No breeding in progress</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Frog Modal -->
+  <div class="modal" id="newFrogModal">
+    <div class="modal-content">
+      <div class="modal-header">Create New Frog</div>
+      <div class="form-group">
+        <label>Frog Name</label>
+        <input type="text" id="frogName" placeholder="e.g. Kermit, Lily, Taddy..." maxlength="50">
+      </div>
+      <div class="form-group">
+        <label>Species</label>
+        <select id="frogSpecies">
+          <option value="Green Tree Frog">Green Tree Frog</option>
+          <option value="Poison Dart Frog">Poison Dart Frog</option>
+          <option value="Bullfrogs">Bullfrogs</option>
+          <option value="Tree Frog">Tree Frog</option>
+          <option value="White Tree Frog">White Tree Frog</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeNewFrogModal()">Cancel</button>
+        <button class="btn-primary" onclick="createFrog()">Create Frog</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breeding Modal -->
+  <div class="modal" id="breedingModal">
+    <div class="modal-content">
+      <div class="modal-header">Start Breeding</div>
+      <p style="margin-bottom: 15px; color: #666;">Both frogs must be level 10 or higher to breed.</p>
+      <div class="form-group">
+        <label>Parent 1</label>
+        <select id="parent1Select">
+          <option value="">Select a frog...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Parent 2</label>
+        <select id="parent2Select">
+          <option value="">Select a frog...</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeBreedingModal()">Cancel</button>
+        <button class="btn-primary" onclick="startBreeding()">Start Breeding</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Frog Modal -->
+  <div class="modal" id="editFrogModal">
+    <div class="modal-content">
+      <div class="modal-header">Edit Frog</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(event, 'editBasic')">Basic Info</button>
+        <button class="tab" onclick="switchTab(event, 'editHabitat')">Habitat</button>
+      </div>
+
+      <div id="editBasic" class="tab-content active">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="editFrogName" maxlength="50">
+        </div>
+        <div class="stats">
+          <div class="stat-row">
+            <span class="stat-label">Level</span>
+            <span class="stat-value" id="editLevel">1</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Experience</span>
+            <div class="stat-bar">
+              <div class="stat-bar-fill" id="editExpBar" style="width: 0%"></div>
+            </div>
+            <span class="stat-value" id="editExp">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Happiness</span>
+            <div class="stat-bar">
+              <div class="stat-bar-fill" id="editHappinessBar" style="width: 100%"></div>
+            </div>
+            <span class="stat-value" id="editHappiness">100</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Energy</span>
+            <div class="stat-bar">
+              <div class="stat-bar-fill" id="editEnergyBar" style="width: 100%"></div>
+            </div>
+            <span class="stat-value" id="editEnergy">100</span>
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn-primary" onclick="playWithFrog()">Play 🎮</button>
+          <button class="btn-primary" onclick="feedFrog()">Feed 🍎</button>
+        </div>
+      </div>
+
+      <div id="editHabitat" class="tab-content">
+        <div class="form-group">
+          <label>Wallpaper</label>
+          <div class="color-picker" id="wallpaperPicker"></div>
+        </div>
+        <div class="form-group">
+          <label>Add Item to Habitat</label>
+          <div class="button-group">
+            <button class="btn-secondary" onclick="addHabitatItem('toy', 'Ball')">🔴 Ball</button>
+            <button class="btn-secondary" onclick="addHabitatItem('toy', 'Plant')">🌿 Plant</button>
+          </div>
+          <div class="button-group">
+            <button class="btn-secondary" onclick="addHabitatItem('toy', 'Log')">🪵 Log</button>
+            <button class="btn-secondary" onclick="addHabitatItem('toy', 'Water')">💧 Water</button>
+          </div>
+        </div>
+        <div class="habitat-container" id="habitatPreview"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeEditFrogModal()">Cancel</button>
+        <button class="btn-danger" onclick="deleteFrog()">Delete</button>
+        <button class="btn-primary" onclick="saveFrog()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let allFrogs = [];
+    let selectedFrogId = null;
+    let currentHabitatId = null;
+
+    const speciesInfo = {
+      'Green Tree Frog': { emoji: '🟢', color: '#90EE90' },
+      'Poison Dart Frog': { emoji: '🔵', color: '#4169E1' },
+      'Bullfrogs': { emoji: '🟤', color: '#8B4513' },
+      'Tree Frog': { emoji: '🌸', color: '#FFB6C1' },
+      'White Tree Frog': { emoji: '⚪', color: '#F5F5F5' }
+    };
+
+    const wallpapers = {
+      'forest': 'Forest 🌲',
+      'volcanic': 'Volcanic 🌋',
+      'underwater': 'Underwater 🌊',
+      'arctic': 'Arctic ❄️'
+    };
+
+    // Initialize
+    loadFrogs();
+    setInterval(loadFrogs, 2000);
+    setInterval(loadBreeding, 1000);
+    loadBreeding();
+
+    async function loadFrogs() {
+      const res = await fetch(`${API_BASE}/frogs`);
+      allFrogs = await res.json();
+      renderFrogGrid();
+    }
+
+    async function loadBreeding() {
+      const res = await fetch(`${API_BASE}/breeding`);
+      const breedings = await res.json();
+      renderBreeding(breedings);
+    }
+
+    function renderFrogGrid() {
+      const grid = document.getElementById('frogGrid');
+      if (allFrogs.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🐸</div>
+            <p>No frogs yet. Create your first frog to get started!</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = allFrogs.map(frog => `
+        <div class="frog-card ${selectedFrogId === frog.id ? 'selected' : ''}" onclick="selectFrog(${frog.id})">
+          <div class="frog-emoji">${speciesInfo[frog.species]?.emoji || '🐸'}</div>
+          <div class="frog-name">${frog.name}</div>
+          <div class="frog-level">Lvl ${frog.level} ${frog.level >= 10 ? '✓ Can Breed' : ''}</div>
+        </div>
+      `).join('');
+    }
+
+    async function selectFrog(frogId) {
+      selectedFrogId = frogId;
+      const frog = allFrogs.find(f => f.id === frogId);
+
+      if (!frog) return;
+
+      const res = await fetch(`${API_BASE}/habitats/${frogId}`);
+      const habitat = await res.json();
+      currentHabitatId = habitat.id;
+
+      renderFrogGrid();
+      renderFrogDetails(frog, habitat);
+    }
+
+    async function renderFrogDetails(frog, habitat) {
+      const panel = document.getElementById('detailsPanel');
+      const expPercent = (frog.experience % 100);
+
+      let habitatHtml = '';
+      if (habitat && habitat.id) {
+        const itemRes = await fetch(`${API_BASE}/habitats/${habitat.id}/items`);
+        const items = await itemRes.json();
+
+        habitatHtml = `
+          <div class="habitat-container ${habitat.wallpaper || 'forest'}" id="habitatContainer">
+            <div class="frog-in-habitat" style="left: ${50 + Math.random()*20}%; top: ${30 + Math.random()*30}%">
+              ${speciesInfo[frog.species]?.emoji || '🐸'}
+            </div>
+            ${items.map(item => `
+              <div class="habitat-item" style="left: ${item.x}%; top: ${item.y}%"
+                   onclick="removeHabitatItem(${item.id})" title="Click to remove">
+                ${getItemEmoji(item.item_name)}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      panel.innerHTML = `
+        <div class="card">
+          <h2>${frog.name}</h2>
+          <div class="stats">
+            <div class="stat-row">
+              <span class="stat-label">Species</span>
+              <span class="stat-value">${frog.species}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Level</span>
+              <span class="stat-value">${frog.level}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Experience</span>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: ${expPercent}%"></div>
+              </div>
+              <span class="stat-value">${frog.experience}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Happiness</span>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: ${frog.happiness}%"></div>
+              </div>
+              <span class="stat-value">${frog.happiness}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Energy</span>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: ${frog.energy}%"></div>
+              </div>
+              <span class="stat-value">${frog.energy}</span>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button class="btn-primary" onclick="openEditFrogModal(${frog.id})">Edit</button>
+            <button class="btn-secondary" onclick="gainExp(${frog.id}, 10)">Train 💪</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Habitat</h2>
+          ${habitatHtml}
+        </div>
+      `;
+
+      populateWallpaperPicker();
+      populateParentSelects();
+    }
+
+    function getItemEmoji(itemName) {
+      const emojis = {
+        'Ball': '🔴',
+        'Plant': '🌿',
+        'Log': '🪵',
+        'Water': '💧'
+      };
+      return emojis[itemName] || '❓';
+    }
+
+    async function openEditFrogModal(frogId) {
+      const frog = allFrogs.find(f => f.id === frogId);
+      if (!frog) return;
+
+      document.getElementById('editFrogName').value = frog.name;
+      document.getElementById('editLevel').textContent = frog.level;
+      document.getElementById('editExp').textContent = frog.experience;
+      const expPercent = (frog.experience % 100);
+      document.getElementById('editExpBar').style.width = expPercent + '%';
+      document.getElementById('editHappiness').textContent = frog.happiness;
+      document.getElementById('editHappinessBar').style.width = frog.happiness + '%';
+      document.getElementById('editEnergy').textContent = frog.energy;
+      document.getElementById('editEnergyBar').style.width = frog.energy + '%';
+
+      populateWallpaperPicker();
+      renderHabitatPreview(frog.id);
+
+      document.getElementById('editFrogModal').classList.add('active');
+    }
+
+    function closeEditFrogModal() {
+      document.getElementById('editFrogModal').classList.remove('active');
+    }
+
+    async function saveFrog() {
+      const newName = document.getElementById('editFrogName').value;
+      if (!newName.trim()) {
+        alert('Name cannot be empty');
+        return;
+      }
+
+      const frog = allFrogs.find(f => f.id === selectedFrogId);
+      const res = await fetch(`${API_BASE}/frogs/${selectedFrogId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newName,
+          level: frog.level,
+          experience: frog.experience,
+          happiness: frog.happiness,
+          energy: frog.energy
+        })
+      });
+
+      if (res.ok) {
+        closeEditFrogModal();
+        loadFrogs();
+      }
+    }
+
+    async function deleteFrog() {
+      if (!confirm('Are you sure? This will delete the frog permanently!')) return;
+
+      const res = await fetch(`${API_BASE}/frogs/${selectedFrogId}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        selectedFrogId = null;
+        closeEditFrogModal();
+        loadFrogs();
+      }
+    }
+
+    async function gainExp(frogId, amount) {
+      const frog = allFrogs.find(f => f.id === frogId);
+      let newLevel = frog.level;
+      let newExp = frog.experience + amount;
+
+      while (newExp >= 100) {
+        newExp -= 100;
+        newLevel++;
+      }
+
+      const res = await fetch(`${API_BASE}/frogs/${frogId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: frog.name,
+          level: newLevel,
+          experience: newExp,
+          happiness: Math.max(0, frog.happiness - 5),
+          energy: Math.max(0, frog.energy - 10)
+        })
+      });
+
+      if (res.ok) {
+        loadFrogs();
+        selectFrog(frogId);
+      }
+    }
+
+    async function playWithFrog() {
+      const frog = allFrogs.find(f => f.id === selectedFrogId);
+      const res = await fetch(`${API_BASE}/frogs/${selectedFrogId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: frog.name,
+          level: frog.level,
+          experience: frog.experience + 5,
+          happiness: Math.min(100, frog.happiness + 20),
+          energy: Math.max(0, frog.energy - 15)
+        })
+      });
+
+      if (res.ok) {
+        loadFrogs();
+        selectFrog(selectedFrogId);
+      }
+    }
+
+    async function feedFrog() {
+      const frog = allFrogs.find(f => f.id === selectedFrogId);
+      const res = await fetch(`${API_BASE}/frogs/${selectedFrogId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: frog.name,
+          level: frog.level,
+          experience: frog.experience,
+          happiness: Math.min(100, frog.happiness + 10),
+          energy: Math.min(100, frog.energy + 25)
+        })
+      });
+
+      if (res.ok) {
+        loadFrogs();
+        selectFrog(selectedFrogId);
+      }
+    }
+
+    function populateWallpaperPicker() {
+      const picker = document.getElementById('wallpaperPicker');
+      picker.innerHTML = Object.entries(wallpapers).map(([key, label]) => `
+        <button class="color-option" style="background: linear-gradient(135deg, ${key === 'forest' ? '#5a8c61' : key === 'volcanic' ? '#8b5a2b' : key === 'underwater' ? '#4a9d7f' : '#87ceeb'})"
+                onclick="setWallpaper('${key}')">${label}</button>
+      `).join('');
+    }
+
+    async function setWallpaper(wallpaperType) {
+      const res = await fetch(`${API_BASE}/habitats/${currentHabitatId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallpaper: wallpaperType })
+      });
+
+      if (res.ok) {
+        renderHabitatPreview(selectedFrogId);
+      }
+    }
+
+    async function renderHabitatPreview(frogId) {
+      const res = await fetch(`${API_BASE}/habitats/${frogId}`);
+      const habitat = await res.json();
+
+      if (!habitat || !habitat.id) return;
+
+      const itemRes = await fetch(`${API_BASE}/habitats/${habitat.id}/items`);
+      const items = await itemRes.json();
+
+      const preview = document.getElementById('habitatPreview');
+      preview.className = `habitat-container ${habitat.wallpaper || 'forest'}`;
+      preview.innerHTML = items.map(item => `
+        <div class="habitat-item" style="left: ${item.x}%; top: ${item.y}%"
+             onclick="removeHabitatItem(${item.id})" title="Click to remove">
+          ${getItemEmoji(item.item_name)}
+        </div>
+      `).join('');
+    }
+
+    async function addHabitatItem(type, name) {
+      if (!currentHabitatId) return;
+
+      const res = await fetch(`${API_BASE}/habitats/${currentHabitatId}/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_type: type,
+          item_name: name,
+          x: 20 + Math.random() * 60,
+          y: 20 + Math.random() * 60
+        })
+      });
+
+      if (res.ok) {
+        renderHabitatPreview(selectedFrogId);
+      }
+    }
+
+    async function removeHabitatItem(itemId) {
+      const res = await fetch(`${API_BASE}/habitats/${currentHabitatId}/items/${itemId}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        renderHabitatPreview(selectedFrogId);
+      }
+    }
+
+    function populateParentSelects() {
+      const qualifiedFrogs = allFrogs.filter(f => f.level >= 10);
+      const html = qualifiedFrogs.map(f => `<option value="${f.id}">${f.name} (Lvl ${f.level})</option>`).join('');
+
+      document.getElementById('parent1Select').innerHTML = '<option value="">Select a frog...</option>' + html;
+      document.getElementById('parent2Select').innerHTML = '<option value="">Select a frog...</option>' + html;
+    }
+
+    function openBreedingModal() {
+      populateParentSelects();
+      document.getElementById('breedingModal').classList.add('active');
+    }
+
+    function closeBreedingModal() {
+      document.getElementById('breedingModal').classList.remove('active');
+    }
+
+    async function startBreeding() {
+      const parent1 = document.getElementById('parent1Select').value;
+      const parent2 = document.getElementById('parent2Select').value;
+
+      if (!parent1 || !parent2 || parent1 === parent2) {
+        alert('Select two different frogs');
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/breeding`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parent1_id: parseInt(parent1),
+          parent2_id: parseInt(parent2)
+        })
+      });
+
+      if (res.ok) {
+        closeBreedingModal();
+        loadBreeding();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Breeding failed');
+      }
+    }
+
+    function renderBreeding(breedings) {
+      const list = document.getElementById('breedingList');
+
+      if (breedings.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">💕</div>
+            <p>No breeding in progress</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = breedings.map(b => `
+        <div class="breeding-card ${b.status === 'hatched' ? 'hatched' : ''}">
+          <strong>${b.parent1_name} + ${b.parent2_name}</strong>
+          <div style="margin-top: 8px; font-size: 0.9em; color: #666;">
+            ${b.status === 'hatched'
+              ? `🎉 Baby ${b.baby_name} hatched!`
+              : `⏳ Egg incubating... (${new Date(b.hatch_at).toLocaleTimeString()})`}
+          </div>
+          ${b.status === 'incubating' ? `
+            <button class="btn-success" style="margin-top: 10px; width: 100%;" onclick="hatchEgg(${b.id})">
+              Check Egg
+            </button>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    async function hatchEgg(breedingId) {
+      const res = await fetch(`${API_BASE}/breeding/${breedingId}/hatch`, {
+        method: 'POST'
+      });
+
+      if (res.ok) {
+        loadBreeding();
+        loadFrogs();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Not ready yet!');
+      }
+    }
+
+    function openNewFrogModal() {
+      document.getElementById('frogName').value = '';
+      document.getElementById('frogSpecies').value = 'Green Tree Frog';
+      document.getElementById('newFrogModal').classList.add('active');
+    }
+
+    function closeNewFrogModal() {
+      document.getElementById('newFrogModal').classList.remove('active');
+    }
+
+    async function createFrog() {
+      const name = document.getElementById('frogName').value.trim();
+      const species = document.getElementById('frogSpecies').value;
+
+      if (!name) {
+        alert('Please enter a name');
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/frogs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, species })
+      });
+
+      if (res.ok) {
+        closeNewFrogModal();
+        loadFrogs();
+      }
+    }
+
+    function switchTab(e, tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+      e.target.classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+    }
+  </script>
+</body>
+</html>
