@@ -2,12 +2,11 @@
   "name": "pocket-frogs",
   "version": "1.0.0",
   "scripts": {
-    "dev": "node src/server.js",
-    "start": "node src/server.js"
+    "dev": "node --experimental-sqlite src/server.js",
+    "start": "node --experimental-sqlite src/server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
   }
 }
